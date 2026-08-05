@@ -297,10 +297,10 @@ module Udb
       return @alias unless @alias.nil?
 
       if @data.key?("alias")
-        raise "Can't parse alias" unless data["alias"] =~ /^[a-z][a-z0-9]+\.[A-Z0-9]+(\[([0-9]+)(:[0-9]+)?\])?$/
+        raise "Can't parse alias" unless data["alias"] =~ /^([a-z][a-z0-9]+)\.([A-Z0-9]+)(\[([0-9]+)(:[0-9]+)?\])?$/
 
         csr_name = T.must(Regexp.last_match(1))
-        csr_field = Regexp.last_match(2)
+        csr_field = T.must(Regexp.last_match(2))
         range = Regexp.last_match(3)
         range_start = Regexp.last_match(4)
         range_end = Regexp.last_match(5)
