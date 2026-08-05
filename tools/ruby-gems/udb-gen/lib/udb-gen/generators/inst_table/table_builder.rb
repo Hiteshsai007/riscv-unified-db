@@ -96,6 +96,11 @@ module UdbGen
         command = "./bin/generate inst-table"
         command += " -o #{@file_name}" unless @file_name.nil?
 
+        # Sort lines so the output is deterministic regardless of the order in
+        # which instructions are discovered in the database (e.g. moving a file
+        # from inst/Q to inst/Zfa must not change the generated table).
+        lines.sort!
+
         header = <<EOM
 # SPDX-License-Identifier: BSD-3-Clause-Clear
 #
