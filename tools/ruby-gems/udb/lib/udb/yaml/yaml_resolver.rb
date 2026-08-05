@@ -215,6 +215,15 @@ module Udb
           resolve_file(rel_path, input_dir, output_dir, no_checks)
         end
 
+        # Second pass: set $parent_of on parent objects based on $child_of relationships.
+        # This must run after every file has been resolved so that cross-file references
+        # work regardless of file processing order (a child may sort before its parent,
+        # e.g. child.yaml before parent.yaml, so the parent is not yet in @resolved_objs
+        # during the per-file pass).
+        @resolved_objs.each do |rel_path, resolved|
+          set_parent_of_relationships(T.must(resolved).fetch(:data), rel_path)
+        end
+
         yaml_files.each do |rel_path|
           write_resolved_file(rel_path, input_dir, output_dir, no_checks)
         end
@@ -271,11 +280,6 @@ module Udb
         end
 
         resolved_data = resolve_object(data, [], rel_path, data, input_dir, no_checks)
-
-        # Second pass: set $parent_of on parent objects based on $child_of relationships.
-        # This must be done after the full document is resolved because a child (e.g. "bottom")
-        # may be processed after its parent (e.g. "middle") is already in resolved_data.
-        set_parent_of_relationships(resolved_data, rel_path)
 
         @resolved_objs[rel_path] = { data: resolved_data, comments: result[:comments] }
       end

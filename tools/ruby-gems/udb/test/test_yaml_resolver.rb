@@ -560,7 +560,10 @@ class TestYamlResolver < Minitest::Test
     end
   end
 
-  private
+  # NOTE: no `private` marker here. Minitest only collects *public* `test_*`
+  # methods, so a test defined below a `private` marker silently never runs
+  # (see https://github.com/riscv/riscv-unified-db/issues/2143). The helpers
+  # below do not start with `test_`, so keeping them public is harmless.
 
   # Recursively find all compiled AST hashes (identified by having a "source" hash
   # with "file", "begin", and "end" keys — the shape produced by AstNode#source_yaml)
