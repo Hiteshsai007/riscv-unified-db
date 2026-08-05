@@ -150,6 +150,9 @@ module Udb
     def increment_patch
       copy = dup
       copy.instance_variable_set(:@patch, @patch + 1)
+      copy.instance_variable_set(:@minor_given, true)
+      copy.instance_variable_set(:@patch_given, true)
+      copy.refresh_derived!
       copy
     end
 
@@ -168,7 +171,19 @@ module Udb
       else
         raise "Cannot decrement version 0"
       end
+      copy.instance_variable_set(:@minor_given, true)
+      copy.instance_variable_set(:@patch_given, true)
+      copy.refresh_derived!
       copy
+    end
+
+    private
+
+    # Recompute memoized derived state (@version_str, @hash) after mutating
+    # @major/@minor/@patch. Callers must set @minor_given/@patch_given first.
+    def refresh_derived!
+      @version_str = canonical
+      @hash = [@major, @minor, @patch, @pre].hash
     end
   end
 
